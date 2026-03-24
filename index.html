@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nouchi Gospel Scene</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+      background: #05070d;
+      color: white;
+    }
+
+    .scene {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 199, 93, 0.10), transparent 25%),
+        radial-gradient(circle at 80% 15%, rgba(89, 124, 255, 0.08), transparent 25%),
+        linear-gradient(180deg, #0d1220 0%, #080b14 60%, #04050a 100%);
+    }
+
+    .ambient-light {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(255, 219, 122, 0.08), transparent 30%),
+        radial-gradient(circle at 50% 80%, rgba(255,255,255,0.03), transparent 30%);
+      pointer-events: none;
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 24vh;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.08) 10%, rgba(0,0,0,0.45) 100%);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .caption {
+      position: absolute;
+      top: 40px;
+      width: 100%;
+      text-align: center;
+      z-index: 30;
+      font-size: 1.1rem;
+      letter-spacing: 0.4px;
+      color: rgba(255,255,255,0.88);
+      animation: fadeCaption 1.2s ease;
+      pointer-events: none;
+    }
+
+    @keyframes fadeCaption {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .characters-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+    }
+
+    .person {
+      position: absolute;
+      bottom: 12vh;
+    }
+
+    .head {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #ffe0b1, #cc9d6d);
+      box-shadow: 0 0 20px rgba(255, 210, 150, 0.12);
+      z-index: 3;
+    }
+
+    .body {
+      position: absolute;
+      border-radius: 20px;
+      z-index: 2;
+    }
+
+    .arm {
+      position: absolute;
+      border-radius: 20px;
+      z-index: 1;
+      transform-origin: top center;
+    }
+
+    .leg {
+      position: absolute;
+      border-radius: 20px;
+      z-index: 1;
+    }
+
+    .seated {
+      left: 20vw;
+      width: 200px;
+      height: 260px;
+    }
+
+    .seated .chair-seat {
+      position: absolute;
+      left: 30px;
+      bottom: 55px;
+      width: 110px;
+      height: 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.15);
+    }
+
+    .seated .chair-back {
+      position: absolute;
+      left: 22px;
+      bottom: 55px;
+      width: 14px;
+      height: 110px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .seated .head {
+      left: 78px;
+      top: 8px;
+    }
+
+    .seated .body {
+      left: 62px;
+      top: 42px;
+      width: 58px;
+      height: 92px;
+      background: linear-gradient(180deg, #f2c14d, #a87012);
+    }
+
+    .seated .arm.left {
+      left: 42px;
+      top: 58px;
+      width: 16px;
+      height: 74px;
+      background: #cc9d6d;
+      transform: rotate(45deg);
+    }
+
+    .seated .arm.right {
+      left: 112px;
+      top: 62px;
+      width: 14px;
+      height: 72px;
+      background: #cc9d6d;
+      transform: rotate(-22deg);
+    }
+
+    .seated .leg.left {
+      left: 64px;
+      top: 124px;
+      width: 18px;
+      height: 88px;
+      background: #d9dee7;
+      transform: rotate(85deg);
+      transform-origin: top left;
+    }
+
+    .seated .leg.right {
+      left: 100px;
+      top: 126px;
+      width: 18px;
+      height: 80px;
+      background: #d9dee7;
+      transform: rotate(90deg);
+      transform-origin: top left;
+    }
+
+    .giver {
+      right: -240px;
+      width: 180px;
+      height: 280px;
+      animation: walkIn 4s ease forwards;
+      animation-delay: 0.7s;
+    }
+
+    @keyframes walkIn {
+      0% { right: -240px; }
+      100% { right: 28vw; }
+    }
+
+    .giver .head {
+      left: 70px;
+      top: 4px;
+    }
+
+    .giver .body {
+      left: 54px;
+      top: 40px;
+      width: 62px;
+      height: 100px;
+      background: linear-gradient(180deg, #6884ff, #3047a8);
+    }
+
+    .giver .arm.left {
+      left: 42px;
+      top: 54px;
+      width: 14px;
+      height: 74px;
+      background: #cc9d6d;
+      transform: rotate(20deg);
+      animation: giveArm 1.2s ease forwards;
+      animation-delay: 4.4s;
+    }
+
+    .giver .arm.right {
+      left: 116px;
+      top: 52px;
+      width: 15px;
+      height: 88px;
+      background: #cc9d6d;
+      transform: rotate(18deg);
+      animation: giveArmExtended 1.2s ease forwards;
+      animation-delay: 4.4s;
+    }
+
+    @keyframes giveArm {
+      from { transform: rotate(20deg); }
+      to { transform: rotate(40deg); }
+    }
+
+    @keyframes giveArmExtended {
+      from { transform: rotate(18deg); }
+      to { transform: rotate(72deg); }
+    }
+
+    .giver .leg.left {
+      left: 58px;
+      top: 132px;
+      width: 18px;
+      height: 110px;
+      background: #101826;
+      animation: legMoveLeft 0.7s ease-in-out infinite alternate;
+    }
+
+    .giver .leg.right {
+      left: 92px;
+      top: 132px;
+      width: 18px;
+      height: 110px;
+      background: #101826;
+      animation: legMoveRight 0.7s ease-in-out infinite alternate;
+    }
+
+    @keyframes legMoveLeft {
+      from { transform: rotate(5deg); }
+      to { transform: rotate(-8deg); }
+    }
+
+    @keyframes legMoveRight {
+      from { transform: rotate(-5deg); }
+      to { transform: rotate(8deg); }
+    }
+
+    .phone {
+      position: absolute;
+      width: 74px;
+      height: 140px;
+      border-radius: 18px;
+      background: #111827;
+      border: 2px solid rgba(255,255,255,0.12);
+      box-shadow:
+        0 0 0 3px rgba(255,255,255,0.03),
+        0 0 28px rgba(255, 212, 106, 0.18);
+      overflow: hidden;
+      z-index: 22;
+      opacity: 0;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      z-index: 3;
+    }
+
+    .phone-screen {
+      position: absolute;
+      inset: 8px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at top, rgba(255, 205, 96, 0.14), transparent 28%),
+        linear-gradient(180deg, #131a2b 0%, #0a0f1b 60%, #070911 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffe4a1;
+      text-align: center;
+      padding: 16px;
+      font-weight: bold;
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .phone.show {
+      opacity: 1;
+      animation: phoneAppear 1s ease forwards;
+    }
+
+    @keyframes phoneAppear {
+      0% {
+        opacity: 0;
+        transform: scale(0.7);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .phone.zooming {
+      transition: all 2.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) scale(10);
+      opacity: 1;
+      z-index: 60;
+    }
+
+    .app-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 70;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at top, rgba(255, 210, 110, 0.12), transparent 25%),
+        radial-gradient(circle at bottom, rgba(111, 82, 255, 0.08), transparent 26%),
+        linear-gradient(180deg, #0d1220 0%, #080b14 60%, #04050a 100%);
+      transition: opacity 1.4s ease;
+    }
+
+    .app-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .app-halo {
+      position: absolute;
+      width: 430px;
+      height: 430px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 210, 110, 0.20), transparent 70%);
+      filter: blur(18px);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .app-card {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 430px;
+      border-radius: 30px;
+      padding: 30px 24px 24px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(14px);
+      text-align: center;
+      box-shadow:
+        0 0 45px rgba(255, 210, 110, 0.10),
+        0 20px 60px rgba(0,0,0,0.35);
+      animation: floatCard 4.5s ease-in-out infinite;
+      overflow: hidden;
+    }
+
+    .app-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02), rgba(255,209,102,0.04));
+      pointer-events: none;
+    }
+
+    .logo {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 18px;
+      border-radius: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      background: linear-gradient(135deg, #ffdf8d, #e2a835);
+      color: #251400;
+      box-shadow:
+        0 0 18px rgba(255, 215, 120, 0.35),
+        0 0 34px rgba(255, 215, 120, 0.25);
+      animation: glowLogo 2.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glowLogo {
+      from {
+        transform: scale(1);
+      }
+      to {
+        transform: scale(1.05);
+      }
+    }
+
+    .app-card h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.78);
+      font-size: 0.98rem;
+      margin-bottom: 22px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #ffe7a4;
+      background: rgba(255, 219, 122, 0.10);
+      border: 1px solid rgba(255, 219, 122, 0.18);
+    }
+
+    .verse-box {
+      min-height: 165px;
+      border-radius: 22px;
+      padding: 22px 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-bottom: 18px;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: inset 0 0 20px rgba(255,255,255,0.02);
+    }
+
+    .verse-box.flash {
+      transform: scale(1.02);
+      box-shadow:
+        0 0 22px rgba(255, 215, 120, 0.15),
+        inset 0 0 22px rgba(255,255,255,0.03);
+    }
+
+    .verse-text {
+      font-size: 1.08rem;
+      line-height: 1.65;
+      color: #fff7df;
+      transition: all 0.45s ease;
+    }
+
+    .verse-ref {
+      margin-top: 14px;
+      color: #f3c867;
+      font-size: 0.92rem;
+      font-weight: bold;
+      opacity: 0.95;
+      transition: all 0.45s ease;
+    }
+
+    .fade-out {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    button {
+      border: none;
+      outline: none;
+      border-radius: 999px;
+      padding: 14px 20px;
+      cursor: pointer;
+      font-size: 0.98rem;
+      font-weight: 800;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #ffdf8d, #d49622);
+      color: #241300;
+      box-shadow: 0 10px 24px rgba(212, 150, 34, 0.25);
+    }
+
+    .secondary-btn {
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .footer {
+      margin-top: 18px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.54);
+      line-height: 1.5;
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    @media (max-width: 700px) {
+      .seated {
+        left: 10vw;
+        transform: scale(0.9);
+      }
+
+      .giver {
+        transform: scale(0.88);
+      }
+
+      .caption {
+        font-size: 0.95rem;
+        padding: 0 20px;
+      }
+
+      .app-card h1 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <canvas id="bg"></canvas>
+    <div class="ambient-light"></div>
+    <div class="caption" id="caption">Quelqu’un t’apporte une parole qui peut changer ta journée.</div>
+
+    <div class="characters-layer">
+      <div class="person seated">
+        <div class="chair-back"></div>
+        <div class="chair-seat"></div>
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="arm left"></div>
+        <div class="arm right"></div>
+        <div class="leg left"></div>
+        <div class="leg right"></div>
+      </div>
+
+      <div class="person giver" id="giver">
+        <div class="head"></div>
+        <div class="body"></div>
+        <div class="arm left"></div>
+        <div class="arm right"></div>
+        <div class="leg left"></div>
+        <div class="leg right"></div>
+      </div>
+
+      <div class="phone" id="phone">
+        <div class="phone-screen">Nouchi<br>Gospel ✨</div>
+      </div>
+    </div>
+
+    <div class="ground"></div>
+
+    <div class="app-overlay" id="appOverlay">
+      <div class="app-halo"></div>
+
+      <div class="app-card">
+        <div class="logo">✝</div>
+        <h1>Nouchi Gospel</h1>
+        <p class="subtitle">Dieu parle aussi ton langage</p>
+        <div class="badge">App spirituelle • vibe moderne • nouchi + gospel</div>
+
+        <div class="verse-box" id="verseBox">
+          <div class="verse-text" id="verseText">
+            Dieu là il t’a déjà calé hein, faut pas stresser 💛
+          </div>
+          <div class="verse-ref" id="verseRef">
+            Jérémie 29:11 remix
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="primary-btn" id="nextVerseBtn">Un autre message</button>
+          <button class="secondary-btn" id="autoPlayBtn">Mode auto</button>
+        </div>
+
+        <div class="footer">
+          Démo scène + zoom + app en HTML, CSS et JavaScript
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const caption = document.getElementById("caption");
+    const phone = document.getElementById("phone");
+    const giver = document.getElementById("giver");
+    const appOverlay = document.getElementById("appOverlay");
+
+    function positionPhone() {
+      const giverRect = giver.getBoundingClientRect();
+      const sceneRect = document.querySelector(".scene").getBoundingClientRect();
+
+      const x = giverRect.left - sceneRect.left + 40;
+      const y = giverRect.top - sceneRect.top + 70;
+
+      phone.style.left = x + "px";
+      phone.style.top = y + "px";
+    }
+
+    window.addEventListener("resize", positionPhone);
+
+    setTimeout(() => {
+      positionPhone();
+    }, 1000);
+
+    setTimeout(() => {
+      caption.textContent = "L’application arrive...";
+      positionPhone();
+      phone.classList.add("show");
+    }, 4700);
+
+    setTimeout(() => {
+      caption.textContent = "Regarde bien.";
+    }, 6500);
+
+    setTimeout(() => {
+      caption.textContent = "";
+      phone.classList.add("zooming");
+    }, 7600);
+
+    setTimeout(() => {
+      appOverlay.classList.add("show");
+    }, 9200);
+
+    // App verses
+    const verses = [
+      {
+        text: "Dieu là il t’a déjà calé hein, faut pas stresser 💛",
+        ref: "Jérémie 29:11 remix"
+      },
+      {
+        text: "Même si c’est chaud, Dieu est dans le game 🙏",
+        ref: "Psaume 23 version street"
+      },
+      {
+        text: "Tu es béni, avance seulement, faut pas douter 💫",
+        ref: "Philippiens 4:13 revisité"
+      },
+      {
+        text: "Quand chemin là devient noir, Dieu met lumière dedans ⚡",
+        ref: "Psaume 119:105 remix"
+      },
+      {
+        text: "Ne panique pas, le Vieux Père gère la situation 🔥",
+        ref: "Ésaïe 41:10 street"
+      },
+      {
+        text: "Quand tu tombes, lève-toi encore, Dieu t’a pas laissé hein 🤍",
+        ref: "Proverbes inspiration"
+      },
+      {
+        text: "Ton retard là, c’est pas échec, Dieu prépare ton moment ⏳",
+        ref: "Ecclésiaste vibe"
+      },
+      {
+        text: "Même si on te sous-estime, Dieu connaît ta vraie valeur 👑",
+        ref: "Psaume inspiration"
+      }
+    ];
+
+    const verseText = document.getElementById("verseText");
+    const verseRef = document.getElementById("verseRef");
+    const verseBox = document.getElementById("verseBox");
+    const nextVerseBtn = document.getElementById("nextVerseBtn");
+    const autoPlayBtn = document.getElementById("autoPlayBtn");
+
+    let currentIndex = 0;
+    let autoMode = false;
+    let autoInterval = null;
+
+    function showVerse(index) {
+      verseText.classList.add("fade-out");
+      verseRef.classList.add("fade-out");
+      verseBox.classList.add("flash");
+
+      setTimeout(() => {
+        verseText.textContent = verses[index].text;
+        verseRef.textContent = verses[index].ref;
+        verseText.classList.remove("fade-out");
+        verseRef.classList.remove("fade-out");
+      }, 240);
+
+      setTimeout(() => {
+        verseBox.classList.remove("flash");
+      }, 500);
+
+      createBurst();
+    }
+
+    function nextVerse() {
+      currentIndex = (currentIndex + 1) % verses.length;
+      showVerse(currentIndex);
+    }
+
+    nextVerseBtn.addEventListener("click", nextVerse);
+
+    autoPlayBtn.addEventListener("click", () => {
+      autoMode = !autoMode;
+
+      if (autoMode) {
+        autoPlayBtn.textContent = "Stop auto";
+        autoInterval = setInterval(nextVerse, 3000);
+      } else {
+        autoPlayBtn.textContent = "Mode auto";
+        clearInterval(autoInterval);
+      }
+    });
+
+    // Background particles
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+
+    let width = 0;
+    let height = 0;
+    let particles = [];
+
+    class Particle {
+      constructor(x, y, radius, speedX, speedY, alpha) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.speedX = speedX;
+        this.speedY = speedY;
+        this.alpha = alpha;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 219, 122, ${this.alpha})`;
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = "rgba(255, 219, 122, 0.35)";
+        ctx.fill();
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (this.x < 0 || this.x > width) this.speedX *= -1;
+        if (this.y < 0 || this.y > height) this.speedY *= -1;
+
+        this.draw();
+      }
+    }
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initParticles();
+      positionPhone();
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.min(75, Math.floor(width / 20));
+
+      for (let i = 0; i < count; i++) {
+        particles.push(
+          new Particle(
+            Math.random() * width,
+            Math.random() * height,
+            Math.random() * 2.4 + 0.6,
+            (Math.random() - 0.5) * 0.35,
+            (Math.random() - 0.5) * 0.35,
+            Math.random() * 0.55 + 0.12
+          )
+        );
+      }
+    }
+
+    function connectParticles() {
+      for (let a = 0; a < particles.length; a++) {
+        for (let b = a + 1; b < particles.length; b++) {
+          const dx = particles[a].x - particles[b].x;
+          const dy = particles[a].y - particles[b].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 105) {
+            ctx.beginPath();
+            ctx.moveTo(particles[a].x, particles[a].y);
+            ctx.lineTo(particles[b].x, particles[b].y);
+            ctx.strokeStyle = `rgba(255, 219, 122, ${0.08 - distance / 1500})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function drawGradientFog() {
+      const gradient = ctx.createRadialGradient(
+        width / 2, height / 2, 40,
+        width / 2, height / 2, Math.max(width, height) / 1.3
+      );
+      gradient.addColorStop(0, "rgba(255, 210, 110, 0.03)");
+      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    function createBurst() {
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      for (let i = 0; i < 14; i++) {
+        particles.push(
+          new Particle(
+            centerX + (Math.random() - 0.5) * 80,
+            centerY + (Math.random() - 0.5) * 80,
+            Math.random() * 2.8 + 1,
+            (Math.random() - 0.5) * 2.8,
+            (Math.random() - 0.5) * 2.8,
+            0.7
+          )
+        );
+      }
+
+      if (particles.length > 130) {
+        particles.splice(0, particles.length - 95);
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      drawGradientFog();
+
+      for (const particle of particles) {
+        particle.update();
+      }
+
+      connectParticles();
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    animate();
+
+    // Auto start verse change after app opens
+    setTimeout(() => {
+      nextVerse();
+    }, 10500);
+  </script>
+</body>
+</html>

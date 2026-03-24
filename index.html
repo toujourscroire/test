@@ -3,832 +3,1203 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nouchi Gospel Scene</title>
+  <title>Nouchi Gospel Cinematic</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
+    :root{
+      --bg:#07090e;
+      --bg-2:#0b1018;
+      --gold:#c79a62;
+      --gold-soft:#d8b889;
+      --cream:#f7f2e6;
+      --cream-2:#f4ead2;
+      --text:#4c3b2a;
+      --muted:#a59a8d;
+      --white:#ffffff;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --radius:28px;
+      --ease:cubic-bezier(.22,.61,.36,1);
     }
 
-    body {
-      overflow: hidden;
-      background: #05070d;
-      color: white;
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
     }
 
-    .scene {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
+    html,body{
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      background:var(--bg);
+    }
+
+    body{
+      color:#fff;
+    }
+
+    .scene{
+      position:relative;
+      width:100vw;
+      height:100vh;
+      overflow:hidden;
       background:
-        radial-gradient(circle at 20% 20%, rgba(255, 199, 93, 0.10), transparent 25%),
-        radial-gradient(circle at 80% 15%, rgba(89, 124, 255, 0.08), transparent 25%),
-        linear-gradient(180deg, #0d1220 0%, #080b14 60%, #04050a 100%);
+        radial-gradient(circle at 50% 18%, rgba(255,215,140,.06), transparent 22%),
+        radial-gradient(circle at 20% 10%, rgba(131,92,255,.06), transparent 20%),
+        radial-gradient(circle at 80% 15%, rgba(83,169,255,.05), transparent 18%),
+        linear-gradient(180deg, #090c13 0%, #06080d 100%);
     }
 
-    .ambient-light {
-      position: absolute;
-      inset: 0;
+    canvas{
+      position:absolute;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .vignette{
+      position:absolute;
+      inset:0;
+      z-index:1;
+      pointer-events:none;
       background:
-        radial-gradient(circle at 50% 30%, rgba(255, 219, 122, 0.08), transparent 30%),
-        radial-gradient(circle at 50% 80%, rgba(255,255,255,0.03), transparent 30%);
-      pointer-events: none;
-      animation: breathe 4s ease-in-out infinite;
+        radial-gradient(circle at center, transparent 45%, rgba(0,0,0,.28) 100%);
     }
 
-    @keyframes breathe {
-      0%, 100% { opacity: 0.7; }
-      50% { opacity: 1; }
+    .caption{
+      position:absolute;
+      top:36px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:50;
+      padding:12px 18px;
+      border-radius:999px;
+      font-size:.96rem;
+      color:rgba(255,255,255,.88);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(10px);
+      opacity:0;
+      transition:opacity .8s ease, transform .8s ease;
+      text-align:center;
+      max-width:min(90vw,700px);
     }
 
-    .ground {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 24vh;
-      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.08) 10%, rgba(0,0,0,0.45) 100%);
-      border-top: 1px solid rgba(255,255,255,0.05);
+    .caption.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
     }
 
-    .caption {
-      position: absolute;
-      top: 40px;
-      width: 100%;
-      text-align: center;
-      z-index: 30;
-      font-size: 1.1rem;
-      letter-spacing: 0.4px;
-      color: rgba(255,255,255,0.88);
-      animation: fadeCaption 1.2s ease;
-      pointer-events: none;
+    .set{
+      position:absolute;
+      inset:0;
+      z-index:2;
     }
 
-    @keyframes fadeCaption {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .characters-layer {
-      position: absolute;
-      inset: 0;
-      z-index: 10;
-    }
-
-    .person {
-      position: absolute;
-      bottom: 12vh;
-    }
-
-    .head {
-      position: absolute;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: linear-gradient(180deg, #ffe0b1, #cc9d6d);
-      box-shadow: 0 0 20px rgba(255, 210, 150, 0.12);
-      z-index: 3;
-    }
-
-    .body {
-      position: absolute;
-      border-radius: 20px;
-      z-index: 2;
-    }
-
-    .arm {
-      position: absolute;
-      border-radius: 20px;
-      z-index: 1;
-      transform-origin: top center;
-    }
-
-    .leg {
-      position: absolute;
-      border-radius: 20px;
-      z-index: 1;
-    }
-
-    .seated {
-      left: 20vw;
-      width: 200px;
-      height: 260px;
-    }
-
-    .seated .chair-seat {
-      position: absolute;
-      left: 30px;
-      bottom: 55px;
-      width: 110px;
-      height: 16px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.15);
-    }
-
-    .seated .chair-back {
-      position: absolute;
-      left: 22px;
-      bottom: 55px;
-      width: 14px;
-      height: 110px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.12);
-    }
-
-    .seated .head {
-      left: 78px;
-      top: 8px;
-    }
-
-    .seated .body {
-      left: 62px;
-      top: 42px;
-      width: 58px;
-      height: 92px;
-      background: linear-gradient(180deg, #f2c14d, #a87012);
-    }
-
-    .seated .arm.left {
-      left: 42px;
-      top: 58px;
-      width: 16px;
-      height: 74px;
-      background: #cc9d6d;
-      transform: rotate(45deg);
-    }
-
-    .seated .arm.right {
-      left: 112px;
-      top: 62px;
-      width: 14px;
-      height: 72px;
-      background: #cc9d6d;
-      transform: rotate(-22deg);
-    }
-
-    .seated .leg.left {
-      left: 64px;
-      top: 124px;
-      width: 18px;
-      height: 88px;
-      background: #d9dee7;
-      transform: rotate(85deg);
-      transform-origin: top left;
-    }
-
-    .seated .leg.right {
-      left: 100px;
-      top: 126px;
-      width: 18px;
-      height: 80px;
-      background: #d9dee7;
-      transform: rotate(90deg);
-      transform-origin: top left;
-    }
-
-    .giver {
-      right: -240px;
-      width: 180px;
-      height: 280px;
-      animation: walkIn 4s ease forwards;
-      animation-delay: 0.7s;
-    }
-
-    @keyframes walkIn {
-      0% { right: -240px; }
-      100% { right: 28vw; }
-    }
-
-    .giver .head {
-      left: 70px;
-      top: 4px;
-    }
-
-    .giver .body {
-      left: 54px;
-      top: 40px;
-      width: 62px;
-      height: 100px;
-      background: linear-gradient(180deg, #6884ff, #3047a8);
-    }
-
-    .giver .arm.left {
-      left: 42px;
-      top: 54px;
-      width: 14px;
-      height: 74px;
-      background: #cc9d6d;
-      transform: rotate(20deg);
-      animation: giveArm 1.2s ease forwards;
-      animation-delay: 4.4s;
-    }
-
-    .giver .arm.right {
-      left: 116px;
-      top: 52px;
-      width: 15px;
-      height: 88px;
-      background: #cc9d6d;
-      transform: rotate(18deg);
-      animation: giveArmExtended 1.2s ease forwards;
-      animation-delay: 4.4s;
-    }
-
-    @keyframes giveArm {
-      from { transform: rotate(20deg); }
-      to { transform: rotate(40deg); }
-    }
-
-    @keyframes giveArmExtended {
-      from { transform: rotate(18deg); }
-      to { transform: rotate(72deg); }
-    }
-
-    .giver .leg.left {
-      left: 58px;
-      top: 132px;
-      width: 18px;
-      height: 110px;
-      background: #101826;
-      animation: legMoveLeft 0.7s ease-in-out infinite alternate;
-    }
-
-    .giver .leg.right {
-      left: 92px;
-      top: 132px;
-      width: 18px;
-      height: 110px;
-      background: #101826;
-      animation: legMoveRight 0.7s ease-in-out infinite alternate;
-    }
-
-    @keyframes legMoveLeft {
-      from { transform: rotate(5deg); }
-      to { transform: rotate(-8deg); }
-    }
-
-    @keyframes legMoveRight {
-      from { transform: rotate(-5deg); }
-      to { transform: rotate(8deg); }
-    }
-
-    .phone {
-      position: absolute;
-      width: 74px;
-      height: 140px;
-      border-radius: 18px;
-      background: #111827;
-      border: 2px solid rgba(255,255,255,0.12);
-      box-shadow:
-        0 0 0 3px rgba(255,255,255,0.03),
-        0 0 28px rgba(255, 212, 106, 0.18);
-      overflow: hidden;
-      z-index: 22;
-      opacity: 0;
-    }
-
-    .phone::before {
-      content: "";
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 32px;
-      height: 5px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.15);
-      z-index: 3;
-    }
-
-    .phone-screen {
-      position: absolute;
-      inset: 8px;
-      border-radius: 14px;
+    .floor{
+      position:absolute;
+      left:-10%;
+      right:-10%;
+      bottom:-12vh;
+      height:35vh;
+      border-radius:50%;
       background:
-        radial-gradient(circle at top, rgba(255, 205, 96, 0.14), transparent 28%),
-        linear-gradient(180deg, #131a2b 0%, #0a0f1b 60%, #070911 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffe4a1;
-      text-align: center;
-      padding: 16px;
-      font-weight: bold;
-      font-size: 0.92rem;
-      line-height: 1.4;
+        radial-gradient(ellipse at center, rgba(255,224,166,.06), rgba(0,0,0,0) 60%),
+        linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
+      filter:blur(4px);
     }
 
-    .phone.show {
-      opacity: 1;
-      animation: phoneAppear 1s ease forwards;
+    .lamp-wrap{
+      position:absolute;
+      left:50%;
+      top:-4px;
+      transform:translateX(-50%);
+      z-index:8;
+      width:260px;
+      height:430px;
+      pointer-events:none;
     }
 
-    @keyframes phoneAppear {
-      0% {
-        opacity: 0;
-        transform: scale(0.7);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
+    .cable{
+      position:absolute;
+      left:50%;
+      top:0;
+      width:4px;
+      height:120px;
+      transform:translateX(-50%);
+      background:linear-gradient(180deg,#3f4650,#6d747f);
+      border-radius:10px;
+      opacity:.8;
     }
 
-    .phone.zooming {
-      transition: all 2.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-      left: 50% !important;
-      top: 50% !important;
-      transform: translate(-50%, -50%) scale(10);
-      opacity: 1;
-      z-index: 60;
+    .lamp{
+      position:absolute;
+      left:50%;
+      top:112px;
+      transform:translateX(-50%);
+      width:220px;
+      height:160px;
+      filter:drop-shadow(0 18px 28px rgba(0,0,0,.35));
     }
 
-    .app-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 70;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      opacity: 0;
-      pointer-events: none;
+    .shade{
+      position:absolute;
+      left:50%;
+      top:0;
+      width:220px;
+      height:120px;
+      transform:translateX(-50%);
+      border-radius:120px 120px 60px 60px;
       background:
-        radial-gradient(circle at top, rgba(255, 210, 110, 0.12), transparent 25%),
-        radial-gradient(circle at bottom, rgba(111, 82, 255, 0.08), transparent 26%),
-        linear-gradient(180deg, #0d1220 0%, #080b14 60%, #04050a 100%);
-      transition: opacity 1.4s ease;
-    }
-
-    .app-overlay.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .app-halo {
-      position: absolute;
-      width: 430px;
-      height: 430px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 210, 110, 0.20), transparent 70%);
-      filter: blur(18px);
-      animation: pulse 3s ease-in-out infinite;
-    }
-
-    .app-card {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 430px;
-      border-radius: 30px;
-      padding: 30px 24px 24px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(14px);
-      text-align: center;
+        linear-gradient(180deg,#efefef 0%, #d7d7d7 62%, #c2c2c2 100%);
       box-shadow:
-        0 0 45px rgba(255, 210, 110, 0.10),
-        0 20px 60px rgba(0,0,0,0.35);
-      animation: floatCard 4.5s ease-in-out infinite;
-      overflow: hidden;
+        inset 0 -10px 20px rgba(0,0,0,.12),
+        inset 0 10px 12px rgba(255,255,255,.6);
     }
 
-    .app-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.02), rgba(255,209,102,0.04));
-      pointer-events: none;
+    .shade::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:-8px;
+      transform:translateX(-50%);
+      width:170px;
+      height:16px;
+      border-radius:16px;
+      background:rgba(40,40,40,.18);
+      filter:blur(2px);
     }
 
-    .logo {
-      width: 96px;
-      height: 96px;
-      margin: 0 auto 18px;
-      border-radius: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 42px;
-      background: linear-gradient(135deg, #ffdf8d, #e2a835);
-      color: #251400;
+    .bulb{
+      position:absolute;
+      left:50%;
+      top:56px;
+      width:46px;
+      height:46px;
+      transform:translateX(-50%);
+      border-radius:50%;
+      background:#5e5a4d;
+      box-shadow:0 0 0 rgba(255,216,140,0);
+      transition:
+        background .8s var(--ease),
+        box-shadow 1.2s var(--ease),
+        opacity .8s var(--ease);
+      opacity:.8;
+    }
+
+    .pull{
+      position:absolute;
+      left:50%;
+      top:104px;
+      width:2px;
+      height:92px;
+      transform:translateX(48px);
+      background:linear-gradient(180deg,#9f9f9f,#c3c3c3);
+      opacity:.9;
+    }
+
+    .pull::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:-10px;
+      width:16px;
+      height:16px;
+      transform:translateX(-50%);
+      border-radius:50%;
+      background:linear-gradient(180deg,#dcb17a,#b58248);
+      box-shadow:0 0 0 4px rgba(255,214,152,.08);
+    }
+
+    .light-cone{
+      position:absolute;
+      left:50%;
+      top:185px;
+      transform:translateX(-50%);
+      width:0;
+      height:0;
+      border-left:260px solid transparent;
+      border-right:260px solid transparent;
+      border-top:540px solid rgba(255,225,165,.04);
+      filter:blur(4px);
+      opacity:0;
+      transition:opacity 1s var(--ease);
+      z-index:4;
+      mix-blend-mode:screen;
+    }
+
+    .light-halo{
+      position:absolute;
+      left:50%;
+      top:132px;
+      transform:translateX(-50%);
+      width:300px;
+      height:300px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,222,150,.23), rgba(255,222,150,.09) 35%, transparent 68%);
+      opacity:0;
+      filter:blur(14px);
+      transition:opacity 1.2s var(--ease), transform 1.2s var(--ease);
+      z-index:3;
+    }
+
+    .lamp.on .bulb{
+      background:#ffe4ad;
       box-shadow:
-        0 0 18px rgba(255, 215, 120, 0.35),
-        0 0 34px rgba(255, 215, 120, 0.25);
-      animation: glowLogo 2.2s ease-in-out infinite alternate;
+        0 0 22px rgba(255,219,140,.85),
+        0 0 50px rgba(255,219,140,.35),
+        0 0 100px rgba(255,219,140,.16);
+      opacity:1;
     }
 
-    @keyframes glowLogo {
-      from {
-        transform: scale(1);
-      }
-      to {
-        transform: scale(1.05);
-      }
+    .lamp.on ~ .light-cone{
+      opacity:1;
     }
 
-    .app-card h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      margin-bottom: 8px;
+    .lamp.on ~ .light-halo{
+      opacity:1;
+      transform:translateX(-50%) scale(1.06);
     }
 
-    .subtitle {
-      color: rgba(255,255,255,0.78);
-      font-size: 0.98rem;
-      margin-bottom: 22px;
+    .bible-stage{
+      position:absolute;
+      left:50%;
+      top:58%;
+      transform:translate(-50%,-50%) scale(.8);
+      z-index:12;
+      opacity:0;
+      transition:opacity 1s var(--ease), transform 1.2s var(--ease);
+      width:min(54vw,530px);
+      aspect-ratio:1.45/1;
+      pointer-events:none;
     }
 
-    .badge {
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      margin-bottom: 18px;
-      font-size: 0.84rem;
-      font-weight: 700;
-      color: #ffe7a4;
-      background: rgba(255, 219, 122, 0.10);
-      border: 1px solid rgba(255, 219, 122, 0.18);
+    .bible-stage.show{
+      opacity:1;
+      transform:translate(-50%,-50%) scale(1);
     }
 
-    .verse-box {
-      min-height: 165px;
-      border-radius: 22px;
-      padding: 22px 18px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin-bottom: 18px;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      box-shadow: inset 0 0 20px rgba(255,255,255,0.02);
+    .glory{
+      position:absolute;
+      inset:-60px;
+      border-radius:50%;
+      background:
+        radial-gradient(circle, rgba(255,224,163,.18), transparent 55%);
+      opacity:.8;
+      filter:blur(12px);
+      animation:gloryPulse 3s ease-in-out infinite;
     }
 
-    .verse-box.flash {
-      transform: scale(1.02);
+    @keyframes gloryPulse{
+      0%,100%{transform:scale(.96); opacity:.58;}
+      50%{transform:scale(1.04); opacity:.9;}
+    }
+
+    .bible{
+      position:absolute;
+      inset:0;
+      filter:drop-shadow(0 34px 36px rgba(0,0,0,.45));
+      transform-style:preserve-3d;
+      perspective:1200px;
+    }
+
+    .cover-left,
+    .cover-right{
+      position:absolute;
+      top:10%;
+      width:50%;
+      height:72%;
+      border-radius:18px;
+      background:
+        linear-gradient(180deg,#6b4a25 0%, #4d3116 100%);
       box-shadow:
-        0 0 22px rgba(255, 215, 120, 0.15),
-        inset 0 0 22px rgba(255,255,255,0.03);
+        inset 0 0 0 2px rgba(255,218,171,.08),
+        inset 0 -10px 18px rgba(0,0,0,.28);
     }
 
-    .verse-text {
-      font-size: 1.08rem;
-      line-height: 1.65;
-      color: #fff7df;
-      transition: all 0.45s ease;
+    .cover-left{
+      left:4%;
+      transform:perspective(1000px) rotateY(18deg);
+      transform-origin:right center;
     }
 
-    .verse-ref {
-      margin-top: 14px;
-      color: #f3c867;
-      font-size: 0.92rem;
-      font-weight: bold;
-      opacity: 0.95;
-      transition: all 0.45s ease;
+    .cover-right{
+      right:4%;
+      transform:perspective(1000px) rotateY(-18deg);
+      transform-origin:left center;
     }
 
-    .fade-out {
-      opacity: 0;
-      transform: translateY(10px);
+    .pages{
+      position:absolute;
+      left:50%;
+      top:13%;
+      width:78%;
+      height:66%;
+      transform:translateX(-50%);
+      pointer-events:none;
     }
 
-    .buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 6px;
+    .page-stack{
+      position:absolute;
+      inset:0;
+      border-radius:10px;
+      background:
+        linear-gradient(180deg,#f9f2e7 0%, #f6eddc 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(116,85,39,.05),
+        0 8px 12px rgba(0,0,0,.12);
     }
 
-    button {
-      border: none;
-      outline: none;
-      border-radius: 999px;
-      padding: 14px 20px;
-      cursor: pointer;
-      font-size: 0.98rem;
-      font-weight: 800;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    .page-stack::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:0;
+      width:2px;
+      height:100%;
+      transform:translateX(-50%);
+      background:rgba(167,138,92,.12);
     }
 
-    button:hover {
-      transform: translateY(-2px) scale(1.02);
+    .page-stack::after{
+      content:"";
+      position:absolute;
+      left:12%;
+      right:12%;
+      top:18%;
+      height:1px;
+      background:rgba(186,157,111,.18);
+      box-shadow:
+        0 22px 0 rgba(186,157,111,.12),
+        0 44px 0 rgba(186,157,111,.12),
+        0 66px 0 rgba(186,157,111,.12),
+        0 88px 0 rgba(186,157,111,.12),
+        0 110px 0 rgba(186,157,111,.12),
+        0 132px 0 rgba(186,157,111,.12);
     }
 
-    .primary-btn {
-      background: linear-gradient(135deg, #ffdf8d, #d49622);
-      color: #241300;
-      box-shadow: 0 10px 24px rgba(212, 150, 34, 0.25);
+    .page-flip{
+      position:absolute;
+      top:0;
+      right:50%;
+      width:50%;
+      height:100%;
+      transform-origin:right center;
+      transform-style:preserve-3d;
+      animation:flipPage .9s linear infinite;
     }
 
-    .secondary-btn {
-      background: rgba(255,255,255,0.08);
-      color: white;
-      border: 1px solid rgba(255,255,255,0.12);
+    .page-flip::before,
+    .page-flip::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:0 10px 10px 0;
+      backface-visibility:hidden;
     }
 
-    .footer {
-      margin-top: 18px;
-      font-size: 0.82rem;
-      color: rgba(255,255,255,0.54);
-      line-height: 1.5;
+    .page-flip::before{
+      background:linear-gradient(90deg,#f7f0df 0%, #fffaf0 100%);
+      box-shadow:inset 8px 0 14px rgba(0,0,0,.05);
     }
 
-    canvas {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
+    .page-flip::after{
+      transform:rotateY(180deg);
+      background:linear-gradient(90deg,#f3e8d3 0%, #fbf5ea 100%);
+      box-shadow:inset -8px 0 14px rgba(0,0,0,.08);
     }
 
-    @media (max-width: 700px) {
-      .seated {
-        left: 10vw;
-        transform: scale(0.9);
+    @keyframes flipPage{
+      0%{transform:perspective(1000px) rotateY(0deg);}
+      100%{transform:perspective(1000px) rotateY(-180deg);}
+    }
+
+    .page-flip.paused{
+      animation-play-state:paused;
+    }
+
+    .sacred-ray{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:12px;
+      height:12px;
+      transform:translate(-50%,-50%);
+      border-radius:50%;
+      background:#ffe7af;
+      box-shadow:
+        0 0 10px rgba(255,228,166,.8),
+        0 0 30px rgba(255,228,166,.6),
+        0 0 60px rgba(255,228,166,.35);
+      opacity:0;
+      z-index:14;
+    }
+
+    .sacred-ray.active{
+      opacity:1;
+      animation:rayTravel 2.2s var(--ease) forwards;
+    }
+
+    @keyframes rayTravel{
+      0%{
+        transform:translate(-50%,-240px) scale(.6);
+        opacity:0;
+      }
+      15%{
+        opacity:1;
+      }
+      65%{
+        transform:translate(-50%,-15px) scale(1.1);
+        opacity:1;
+      }
+      100%{
+        transform:translate(-50%,40px) scale(.95);
+        opacity:1;
+      }
+    }
+
+    .verse-mark{
+      position:absolute;
+      left:50%;
+      top:57%;
+      transform:translate(-50%,-50%);
+      width:70%;
+      height:26%;
+      border-radius:18px;
+      background:linear-gradient(90deg, rgba(255,221,153,.06), rgba(255,221,153,.16), rgba(255,221,153,.06));
+      border:1px solid rgba(201,155,92,.2);
+      filter:blur(.4px);
+      opacity:0;
+      z-index:13;
+      transition:opacity .6s ease;
+    }
+
+    .verse-mark.show{
+      opacity:1;
+    }
+
+    .phone-stage{
+      position:absolute;
+      left:50%;
+      top:53%;
+      transform:translate(-50%,-50%) scale(.6);
+      z-index:30;
+      opacity:0;
+      transition:
+        opacity 1s var(--ease),
+        transform 1.4s var(--ease);
+      pointer-events:none;
+    }
+
+    .phone-stage.show{
+      opacity:1;
+      transform:translate(-50%,-50%) scale(1);
+    }
+
+    .phone-shell{
+      position:relative;
+      width:min(26vw,310px);
+      min-width:250px;
+      aspect-ratio:9/19;
+      border-radius:42px;
+      padding:12px;
+      background:
+        linear-gradient(135deg,#15181f,#090b10);
+      box-shadow:
+        0 30px 70px rgba(0,0,0,.55),
+        inset 0 1px 0 rgba(255,255,255,.08),
+        inset 0 -1px 0 rgba(255,255,255,.03);
+    }
+
+    .phone-shell::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:10px;
+      transform:translateX(-50%);
+      width:92px;
+      height:7px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      z-index:5;
+    }
+
+    .phone-reflect{
+      position:absolute;
+      inset:0;
+      border-radius:42px;
+      background:linear-gradient(120deg, rgba(255,255,255,.06), transparent 24%, transparent 60%, rgba(255,255,255,.04) 100%);
+      pointer-events:none;
+      z-index:4;
+    }
+
+    .phone-screen{
+      position:relative;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      border-radius:32px;
+      background:#fff;
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);
+    }
+
+    .screen-layer{
+      position:absolute;
+      inset:0;
+      transition:opacity .8s ease, transform .8s ease;
+    }
+
+    .splash-screen{
+      background:linear-gradient(180deg,#fbf7ee 0%, #f7eedb 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:34px 26px;
+    }
+
+    .splash-wave{
+      position:absolute;
+      left:-10%;
+      right:-10%;
+      bottom:-6%;
+      height:18%;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(232,202,136,.32), transparent 40%),
+        radial-gradient(ellipse at 72% 32%, rgba(232,202,136,.28), transparent 45%);
+      opacity:.45;
+    }
+
+    .ng-mark{
+      position:relative;
+      width:120px;
+      height:170px;
+      margin-bottom:24px;
+    }
+
+    .ng-cross-v{
+      position:absolute;
+      left:50%;
+      top:0;
+      width:20px;
+      height:118px;
+      transform:translateX(-50%);
+      border-radius:12px;
+      background:rgba(198,153,92,.55);
+    }
+
+    .ng-cross-h{
+      position:absolute;
+      left:50%;
+      top:52px;
+      width:112px;
+      height:16px;
+      transform:translateX(-50%);
+      border-radius:12px;
+      background:rgba(188,144,84,.55);
+    }
+
+    .ng-ring{
+      position:absolute;
+      left:50%;
+      bottom:0;
+      width:88px;
+      height:88px;
+      transform:translateX(-50%);
+      border-radius:50%;
+      background:#f3f6fb;
+      border:1px solid rgba(178,168,154,.22);
+      box-shadow:0 8px 20px rgba(0,0,0,.05);
+      display:grid;
+      place-items:center;
+    }
+
+    .ng-ring span{
+      color:#c69158;
+      font-weight:700;
+      font-size:2.2rem;
+      line-height:1;
+    }
+
+    .brand{
+      color:#c38f58;
+      font-weight:700;
+      letter-spacing:.14em;
+      font-size:1.8rem;
+      margin-bottom:10px;
+    }
+
+    .tagline{
+      color:#9f9a91;
+      font-size:1rem;
+      font-weight:400;
+    }
+
+    .home-screen{
+      opacity:0;
+      transform:scale(1.02);
+      background:linear-gradient(180deg,#fbf7ee 0%, #f4e6bf 100%);
+      color:var(--text);
+      padding:20px 16px 14px;
+    }
+
+    .home-screen.show{
+      opacity:1;
+      transform:scale(1);
+    }
+
+    .statusbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:.72rem;
+      color:#7b7468;
+      margin-bottom:14px;
+    }
+
+    .status-icons{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      opacity:.8;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      margin-bottom:14px;
+    }
+
+    .title-block h2{
+      font-size:1.1rem;
+      letter-spacing:.18em;
+      color:#b07f49;
+      font-weight:700;
+      margin-bottom:4px;
+    }
+
+    .title-block p{
+      color:#bcc2c7;
+      font-size:.82rem;
+    }
+
+    .profile{
+      width:40px;
+      height:40px;
+      border-radius:50%;
+      border:1px solid rgba(194,152,93,.35);
+      display:grid;
+      place-items:center;
+      color:#b98b56;
+      background:rgba(255,248,233,.55);
+      font-size:1rem;
+    }
+
+    .hero{
+      position:relative;
+      margin-bottom:14px;
+      height:158px;
+      border-radius:26px;
+      overflow:hidden;
+      background:
+        linear-gradient(180deg,#f7efdf 0%, #f4e7c7 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .hero .mini-mark{
+      position:absolute;
+      inset:0;
+      opacity:.42;
+    }
+
+    .hero-pill{
+      position:relative;
+      z-index:2;
+      display:inline-flex;
+      align-items:center;
+      gap:12px;
+      background:rgba(255,255,255,.66);
+      border:1px solid rgba(188,144,84,.18);
+      color:#b07f49;
+      padding:10px 20px;
+      border-radius:999px;
+      font-size:.92rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      box-shadow:0 10px 18px rgba(0,0,0,.04);
+    }
+
+    .date{
+      color:#a49b8e;
+      font-size:.86rem;
+      margin:6px 2px 10px;
+    }
+
+    .card{
+      background:rgba(255,255,255,.9);
+      border-radius:24px;
+      padding:18px 16px;
+      box-shadow:0 10px 28px rgba(0,0,0,.05);
+      border:1px solid rgba(192,149,90,.08);
+    }
+
+    .verse-card{
+      margin-bottom:12px;
+    }
+
+    .card-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:16px;
+    }
+
+    .card-header h3{
+      color:#b07f49;
+      font-size:.95rem;
+      font-weight:700;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid rgba(192,149,90,.22);
+      color:#ba8b52;
+      background:#fffaf1;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:.82rem;
+      font-weight:600;
+    }
+
+    .quote-mark{
+      font-size:2.4rem;
+      color:#ecd9aa;
+      line-height:1;
+      margin-bottom:6px;
+    }
+
+    .verse-main{
+      font-size:1.08rem;
+      line-height:1.55;
+      color:#60574a;
+      margin-bottom:14px;
+      font-family:Georgia,"Times New Roman",serif;
+    }
+
+    .verse-sub{
+      font-size:.86rem;
+      line-height:1.45;
+      color:#aea89e;
+      margin-bottom:14px;
+      font-style:italic;
+    }
+
+    .verse-ref{
+      color:#b07f49;
+      font-weight:700;
+      font-size:.92rem;
+    }
+
+    .tip-card{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      padding:16px;
+    }
+
+    .tip-icon{
+      width:44px;
+      height:44px;
+      flex:0 0 44px;
+      border-radius:14px;
+      border:1px solid rgba(192,149,90,.2);
+      background:#fffaf1;
+      display:grid;
+      place-items:center;
+      color:#b07f49;
+      font-size:1.1rem;
+    }
+
+    .tip-content h4{
+      color:#a77c49;
+      font-size:.95rem;
+      margin-bottom:6px;
+    }
+
+    .tip-content p{
+      color:#8f8a80;
+      font-size:.82rem;
+      line-height:1.45;
+      margin-bottom:6px;
+    }
+
+    .tip-content small{
+      color:#c3bdb2;
+      font-size:.76rem;
+    }
+
+    .navbar{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      height:68px;
+      background:rgba(255,255,255,.76);
+      border-top:1px solid rgba(0,0,0,.04);
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      padding-top:8px;
+      backdrop-filter:blur(8px);
+    }
+
+    .nav-item{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      gap:4px;
+      color:#b3afa8;
+      font-size:.68rem;
+    }
+
+    .nav-item.active{
+      color:#b07f49;
+    }
+
+    .nav-icon{
+      font-size:1.1rem;
+      line-height:1;
+    }
+
+    .screen-glow{
+      position:absolute;
+      inset:-20%;
+      background:radial-gradient(circle, rgba(255,226,165,.12), transparent 58%);
+      pointer-events:none;
+      opacity:0;
+      transition:opacity 1s ease;
+      z-index:3;
+    }
+
+    .phone-stage.show .screen-glow{
+      opacity:1;
+    }
+
+    .fade-away{
+      opacity:0 !important;
+      transform:translate(-50%,-50%) scale(.92) !important;
+    }
+
+    .fade-set{
+      transition:opacity .8s ease, transform .8s ease;
+    }
+
+    .dim-out{
+      opacity:0;
+    }
+
+    @media (max-width: 720px){
+      .caption{
+        top:20px;
+        font-size:.86rem;
+        padding:10px 14px;
       }
 
-      .giver {
-        transform: scale(0.88);
+      .lamp-wrap{
+        transform:translateX(-50%) scale(.9);
       }
 
-      .caption {
-        font-size: 0.95rem;
-        padding: 0 20px;
+      .bible-stage{
+        width:min(84vw,520px);
+        top:56%;
       }
 
-      .app-card h1 {
-        font-size: 1.75rem;
+      .phone-shell{
+        width:min(64vw,320px);
+        min-width:240px;
+      }
+
+      .brand{
+        font-size:1.5rem;
+      }
+
+      .tagline{
+        font-size:.92rem;
       }
     }
   </style>
 </head>
 <body>
   <div class="scene">
-    <canvas id="bg"></canvas>
-    <div class="ambient-light"></div>
-    <div class="caption" id="caption">Quelqu’un t’apporte une parole qui peut changer ta journée.</div>
+    <canvas id="particles"></canvas>
+    <div class="vignette"></div>
 
-    <div class="characters-layer">
-      <div class="person seated">
-        <div class="chair-back"></div>
-        <div class="chair-seat"></div>
-        <div class="head"></div>
-        <div class="body"></div>
-        <div class="arm left"></div>
-        <div class="arm right"></div>
-        <div class="leg left"></div>
-        <div class="leg right"></div>
+    <div class="caption" id="caption">Le calme… puis la lumière.</div>
+
+    <div class="set fade-set" id="set">
+      <div class="lamp-wrap">
+        <div class="cable"></div>
+
+        <div class="lamp" id="lamp">
+          <div class="shade"></div>
+          <div class="bulb"></div>
+          <div class="pull"></div>
+        </div>
+
+        <div class="light-cone"></div>
+        <div class="light-halo"></div>
       </div>
 
-      <div class="person giver" id="giver">
-        <div class="head"></div>
-        <div class="body"></div>
-        <div class="arm left"></div>
-        <div class="arm right"></div>
-        <div class="leg left"></div>
-        <div class="leg right"></div>
+      <div class="bible-stage" id="bibleStage">
+        <div class="glory"></div>
+        <div class="bible">
+          <div class="cover-left"></div>
+          <div class="cover-right"></div>
+
+          <div class="pages">
+            <div class="page-stack"></div>
+            <div class="page-flip" id="pageFlip"></div>
+          </div>
+
+          <div class="verse-mark" id="verseMark"></div>
+          <div class="sacred-ray" id="sacredRay"></div>
+        </div>
       </div>
 
-      <div class="phone" id="phone">
-        <div class="phone-screen">Nouchi<br>Gospel ✨</div>
+      <div class="floor"></div>
+    </div>
+
+    <div class="phone-stage" id="phoneStage">
+      <div class="phone-shell">
+        <div class="phone-reflect"></div>
+        <div class="screen-glow"></div>
+
+        <div class="phone-screen">
+          <div class="screen-layer splash-screen" id="splashScreen">
+            <div class="ng-mark">
+              <div class="ng-cross-v"></div>
+              <div class="ng-cross-h"></div>
+              <div class="ng-ring"><span>✝</span></div>
+            </div>
+
+            <div class="brand">NOUCHI GOSPEL</div>
+            <div class="tagline">La Parole de Dieu en Nouchi</div>
+            <div class="splash-wave"></div>
+          </div>
+
+          <div class="screen-layer home-screen" id="homeScreen">
+            <div class="statusbar">
+              <span>18:35</span>
+              <div class="status-icons">
+                <span>◧</span>
+                <span>G</span>
+                <span>◌</span>
+              </div>
+            </div>
+
+            <div class="topbar">
+              <div class="title-block">
+                <h2>NOUCHI GOSPEL</h2>
+                <p>Jour 80 / 365</p>
+              </div>
+              <div class="profile">◌</div>
+            </div>
+
+            <div class="hero">
+              <div class="mini-mark">
+                <div class="ng-cross-v" style="height:94px; top:24px; opacity:.7;"></div>
+                <div class="ng-cross-h" style="top:66px; width:120px; opacity:.7;"></div>
+              </div>
+              <div class="hero-pill">✝ <span>IL EST RESSUSCITÉ</span> ✝</div>
+            </div>
+
+            <div class="date">Samedi 21 Mars</div>
+
+            <div class="card verse-card">
+              <div class="card-header">
+                <h3>Verset du Jour</h3>
+                <div class="chip">🙏 Prière</div>
+              </div>
+
+              <div class="quote-mark">“</div>
+
+              <div class="verse-main">
+                Godani est proche de tous ceux qui l’invoquent en vérité.
+              </div>
+
+              <div class="verse-sub">
+                L’Éternel est près de tous ceux qui l’invoquent avec sincérité.
+              </div>
+
+              <div class="verse-ref">▭ Psaume 145:18</div>
+            </div>
+
+            <div class="card tip-card">
+              <div class="tip-icon">🧘</div>
+              <div class="tip-content">
+                <h4>Repos</h4>
+                <p>Aujourd’hui repose-toi et recharge tes batteries avec Godani.</p>
+                <small>▭ Matthieu 11:28</small>
+              </div>
+            </div>
+
+            <div class="navbar">
+              <div class="nav-item active">
+                <div class="nav-icon">📖</div>
+                <div>Lire</div>
+              </div>
+              <div class="nav-item">
+                <div class="nav-icon">♡</div>
+                <div>Favoris</div>
+              </div>
+              <div class="nav-item">
+                <div class="nav-icon">🏷</div>
+                <div>Bon plan</div>
+              </div>
+              <div class="nav-item">
+                <div class="nav-icon">文</div>
+                <div>Glossaire</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="ground"></div>
-
-    <div class="app-overlay" id="appOverlay">
-      <div class="app-halo"></div>
-
-      <div class="app-card">
-        <div class="logo">✝</div>
-        <h1>Nouchi Gospel</h1>
-        <p class="subtitle">Dieu parle aussi ton langage</p>
-        <div class="badge">App spirituelle • vibe moderne • nouchi + gospel</div>
-
-        <div class="verse-box" id="verseBox">
-          <div class="verse-text" id="verseText">
-            Dieu là il t’a déjà calé hein, faut pas stresser 💛
-          </div>
-          <div class="verse-ref" id="verseRef">
-            Jérémie 29:11 remix
-          </div>
-        </div>
-
-        <div class="buttons">
-          <button class="primary-btn" id="nextVerseBtn">Un autre message</button>
-          <button class="secondary-btn" id="autoPlayBtn">Mode auto</button>
-        </div>
-
-        <div class="footer">
-          Démo scène + zoom + app en HTML, CSS et JavaScript
-        </div>
-      </div>
-    </div>
   </div>
 
   <script>
+    const lamp = document.getElementById("lamp");
+    const bibleStage = document.getElementById("bibleStage");
+    const pageFlip = document.getElementById("pageFlip");
+    const sacredRay = document.getElementById("sacredRay");
+    const verseMark = document.getElementById("verseMark");
+    const phoneStage = document.getElementById("phoneStage");
+    const splashScreen = document.getElementById("splashScreen");
+    const homeScreen = document.getElementById("homeScreen");
+    const setEl = document.getElementById("set");
     const caption = document.getElementById("caption");
-    const phone = document.getElementById("phone");
-    const giver = document.getElementById("giver");
-    const appOverlay = document.getElementById("appOverlay");
 
-    function positionPhone() {
-      const giverRect = giver.getBoundingClientRect();
-      const sceneRect = document.querySelector(".scene").getBoundingClientRect();
-
-      const x = giverRect.left - sceneRect.left + 40;
-      const y = giverRect.top - sceneRect.top + 70;
-
-      phone.style.left = x + "px";
-      phone.style.top = y + "px";
+    function showCaption(text) {
+      caption.textContent = text;
+      caption.classList.add("show");
     }
 
-    window.addEventListener("resize", positionPhone);
+    function hideCaption() {
+      caption.classList.remove("show");
+    }
+
+    showCaption("Le calme… puis la lumière.");
+
+    // Timeline
+    setTimeout(() => {
+      showCaption("La lampe s’allume.");
+      lamp.classList.add("on");
+    }, 3000);
 
     setTimeout(() => {
-      positionPhone();
-    }, 1000);
+      showCaption("La Bible apparaît.");
+      bibleStage.classList.add("show");
+    }, 4300);
 
     setTimeout(() => {
-      caption.textContent = "L’application arrive...";
-      positionPhone();
-      phone.classList.add("show");
-    }, 4700);
+      showCaption("Les pages défilent…");
+    }, 5400);
 
     setTimeout(() => {
-      caption.textContent = "Regarde bien.";
-    }, 6500);
-
-    setTimeout(() => {
-      caption.textContent = "";
-      phone.classList.add("zooming");
+      showCaption("La lumière s’arrête sur la Parole.");
+      pageFlip.classList.add("paused");
+      sacredRay.classList.add("active");
     }, 7600);
 
     setTimeout(() => {
-      appOverlay.classList.add("show");
-    }, 9200);
+      verseMark.classList.add("show");
+    }, 9100);
 
-    // App verses
-    const verses = [
-      {
-        text: "Dieu là il t’a déjà calé hein, faut pas stresser 💛",
-        ref: "Jérémie 29:11 remix"
-      },
-      {
-        text: "Même si c’est chaud, Dieu est dans le game 🙏",
-        ref: "Psaume 23 version street"
-      },
-      {
-        text: "Tu es béni, avance seulement, faut pas douter 💫",
-        ref: "Philippiens 4:13 revisité"
-      },
-      {
-        text: "Quand chemin là devient noir, Dieu met lumière dedans ⚡",
-        ref: "Psaume 119:105 remix"
-      },
-      {
-        text: "Ne panique pas, le Vieux Père gère la situation 🔥",
-        ref: "Ésaïe 41:10 street"
-      },
-      {
-        text: "Quand tu tombes, lève-toi encore, Dieu t’a pas laissé hein 🤍",
-        ref: "Proverbes inspiration"
-      },
-      {
-        text: "Ton retard là, c’est pas échec, Dieu prépare ton moment ⏳",
-        ref: "Ecclésiaste vibe"
-      },
-      {
-        text: "Même si on te sous-estime, Dieu connaît ta vraie valeur 👑",
-        ref: "Psaume inspiration"
-      }
-    ];
+    setTimeout(() => {
+      showCaption("Puis l’application se révèle.");
+      setEl.classList.add("dim-out");
+      phoneStage.classList.add("show");
+    }, 10800);
 
-    const verseText = document.getElementById("verseText");
-    const verseRef = document.getElementById("verseRef");
-    const verseBox = document.getElementById("verseBox");
-    const nextVerseBtn = document.getElementById("nextVerseBtn");
-    const autoPlayBtn = document.getElementById("autoPlayBtn");
+    setTimeout(() => {
+      showCaption("Nouchi Gospel.");
+    }, 11800);
 
-    let currentIndex = 0;
-    let autoMode = false;
-    let autoInterval = null;
+    setTimeout(() => {
+      splashScreen.style.opacity = "0";
+      splashScreen.style.transform = "scale(.985)";
+      homeScreen.classList.add("show");
+      showCaption("La Parole de Dieu en Nouchi.");
+    }, 13800);
 
-    function showVerse(index) {
-      verseText.classList.add("fade-out");
-      verseRef.classList.add("fade-out");
-      verseBox.classList.add("flash");
+    setTimeout(() => {
+      hideCaption();
+    }, 16500);
 
-      setTimeout(() => {
-        verseText.textContent = verses[index].text;
-        verseRef.textContent = verses[index].ref;
-        verseText.classList.remove("fade-out");
-        verseRef.classList.remove("fade-out");
-      }, 240);
-
-      setTimeout(() => {
-        verseBox.classList.remove("flash");
-      }, 500);
-
-      createBurst();
-    }
-
-    function nextVerse() {
-      currentIndex = (currentIndex + 1) % verses.length;
-      showVerse(currentIndex);
-    }
-
-    nextVerseBtn.addEventListener("click", nextVerse);
-
-    autoPlayBtn.addEventListener("click", () => {
-      autoMode = !autoMode;
-
-      if (autoMode) {
-        autoPlayBtn.textContent = "Stop auto";
-        autoInterval = setInterval(nextVerse, 3000);
-      } else {
-        autoPlayBtn.textContent = "Mode auto";
-        clearInterval(autoInterval);
-      }
-    });
-
-    // Background particles
-    const canvas = document.getElementById("bg");
+    // Particles background
+    const canvas = document.getElementById("particles");
     const ctx = canvas.getContext("2d");
 
-    let width = 0;
-    let height = 0;
+    let w = 0;
+    let h = 0;
     let particles = [];
 
     class Particle {
-      constructor(x, y, radius, speedX, speedY, alpha) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.speedX = speedX;
-        this.speedY = speedY;
-        this.alpha = alpha;
+      constructor() {
+        this.reset(true);
+      }
+
+      reset(initial = false) {
+        this.x = Math.random() * w;
+        this.y = initial ? Math.random() * h : h + 10;
+        this.r = Math.random() * 1.8 + 0.4;
+        this.vx = (Math.random() - 0.5) * 0.18;
+        this.vy = -(Math.random() * 0.22 + 0.05);
+        this.alpha = Math.random() * 0.45 + 0.08;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.y < -10 || this.x < -20 || this.x > w + 20) this.reset();
       }
 
       draw() {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 219, 122, ${this.alpha})`;
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 220, 155, ${this.alpha})`;
         ctx.shadowBlur = 16;
-        ctx.shadowColor = "rgba(255, 219, 122, 0.35)";
+        ctx.shadowColor = "rgba(255, 220, 155, 0.28)";
         ctx.fill();
       }
-
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        if (this.x < 0 || this.x > width) this.speedX *= -1;
-        if (this.y < 0 || this.y > height) this.speedY *= -1;
-
-        this.draw();
-      }
     }
 
-    function resizeCanvas() {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      initParticles();
-      positionPhone();
-    }
-
-    function initParticles() {
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
       particles = [];
-      const count = Math.min(75, Math.floor(width / 20));
-
-      for (let i = 0; i < count; i++) {
-        particles.push(
-          new Particle(
-            Math.random() * width,
-            Math.random() * height,
-            Math.random() * 2.4 + 0.6,
-            (Math.random() - 0.5) * 0.35,
-            (Math.random() - 0.5) * 0.35,
-            Math.random() * 0.55 + 0.12
-          )
-        );
-      }
+      const count = Math.min(100, Math.floor(w / 18));
+      for (let i = 0; i < count; i++) particles.push(new Particle());
     }
 
     function connectParticles() {
-      for (let a = 0; a < particles.length; a++) {
-        for (let b = a + 1; b < particles.length; b++) {
-          const dx = particles[a].x - particles[b].x;
-          const dy = particles[a].y - particles[b].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 105) {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 90) {
             ctx.beginPath();
-            ctx.moveTo(particles[a].x, particles[a].y);
-            ctx.lineTo(particles[b].x, particles[b].y);
-            ctx.strokeStyle = `rgba(255, 219, 122, ${0.08 - distance / 1500})`;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(255, 220, 155, ${0.045 - dist / 2400})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
@@ -836,59 +1207,30 @@
       }
     }
 
-    function drawGradientFog() {
-      const gradient = ctx.createRadialGradient(
-        width / 2, height / 2, 40,
-        width / 2, height / 2, Math.max(width, height) / 1.3
-      );
-      gradient.addColorStop(0, "rgba(255, 210, 110, 0.03)");
-      gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
-    }
-
-    function createBurst() {
-      const centerX = width / 2;
-      const centerY = height / 2;
-
-      for (let i = 0; i < 14; i++) {
-        particles.push(
-          new Particle(
-            centerX + (Math.random() - 0.5) * 80,
-            centerY + (Math.random() - 0.5) * 80,
-            Math.random() * 2.8 + 1,
-            (Math.random() - 0.5) * 2.8,
-            (Math.random() - 0.5) * 2.8,
-            0.7
-          )
-        );
-      }
-
-      if (particles.length > 130) {
-        particles.splice(0, particles.length - 95);
-      }
-    }
-
     function animate() {
-      ctx.clearRect(0, 0, width, height);
-      drawGradientFog();
+      ctx.clearRect(0, 0, w, h);
 
-      for (const particle of particles) {
-        particle.update();
+      const fog = ctx.createRadialGradient(
+        w / 2, h / 2, 10,
+        w / 2, h / 2, Math.max(w, h) / 1.2
+      );
+      fog.addColorStop(0, "rgba(255, 223, 160, 0.02)");
+      fog.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = fog;
+      ctx.fillRect(0, 0, w, h);
+
+      for (const p of particles) {
+        p.update();
+        p.draw();
       }
 
       connectParticles();
       requestAnimationFrame(animate);
     }
 
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+    window.addEventListener("resize", resize);
+    resize();
     animate();
-
-    // Auto start verse change after app opens
-    setTimeout(() => {
-      nextVerse();
-    }, 10500);
   </script>
 </body>
 </html>
